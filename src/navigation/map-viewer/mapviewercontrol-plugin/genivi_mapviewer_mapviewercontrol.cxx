@@ -31,7 +31,9 @@
 #include <unistd.h>
 #include <stdlib.h>
 #if LM
+#include <ilm/ilm_common.h>
 #include <ilm/ilm_client.h>
+#include <ilm/ilm_control.h>
 #endif
 #include "genivi_mapviewer_mapviewercontrol_adaptor.h"
 #include "genivi_navigationcore_routing_proxy.h"
@@ -1467,6 +1469,11 @@ MapViewerControlObj::MapViewerControlObj(MapViewerControl *mapviewercontrol, uin
 	sel.u.p_rect.rl.y=MapViewSize._2;
 	transform_set_screen_selection(trans, &sel);
 #if LM
+	t_ilm_nativedisplay display = (t_ilm_nativedisplay)graphics_get_data(m_graphics.u.graphics, "display");
+	if (ilm_initWithNativedisplay(display) != ILM_SUCCESS) {
+		dbg(0, "error on ilm_initWidthNativeDisplay\n");
+	}
+
 	t_ilm_nativehandle nativehandle=(t_ilm_nativehandle)graphics_get_data(m_graphics.u.graphics,"xwindow_id");
 	t_ilm_surface surfaceId=2000+m_handle;
 	t_ilm_layer layerId=2000;
@@ -1664,8 +1671,10 @@ plugin_init(void)
 	conns[0]->request_name("org.genivi.mapviewer.MapViewerControl");
 	server=new MapViewerControl(*conns[0]);
 #if LM
+#if 0
 	if (ilm_init() != ILM_SUCCESS) {
 		dbg(0,"error on ilm_init\n");
 	}
+#endif
 #endif
 }
